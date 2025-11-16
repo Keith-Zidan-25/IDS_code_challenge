@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  turbopack: {
+    resolveExtensions: [".md", ".js", ".svg", ".zip", ".yml", ".mjs"]
+  }
 };
 
 export default nextConfig;
