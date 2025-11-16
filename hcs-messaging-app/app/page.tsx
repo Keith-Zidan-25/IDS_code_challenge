@@ -16,10 +16,27 @@ export default function App() {
 
   const [topics, setTopics] = useState<string[]>([]);
   const [currentTopic, setTopic] = useState<string>();
-  const [topicCode, setTopicCode] = useState<string>();
+  const [topicCode, setTopicCode] = useState<string>('');
   const [messageInput, setMessageInput] = useState<string>('');
   const [messages, setMessages] = useState<MessageT[]>();
   const [showJoinModal, setShowJoinModal] = useState<boolean>(false);
+
+  const handleDecrypt = async (messages: MessageT[]) => {
+    const result = [];
+    for (const message of messages) {
+      const decryptedMessage = await decryptMessage(message.text);
+      const temp = {
+        id: message.id,
+        sender: message.sender,
+        text: decryptedMessage,
+        timestamp: message.timestamp
+      }
+
+      result.push(temp)
+    }
+
+    return result;
+  }
 
   const selectTopic = async (topic: string) => {
     try {
@@ -29,7 +46,8 @@ export default function App() {
         throw new Error(response.statusText);
       }
       const messages = await response.json();
-      setMessages(messages);
+      const decryptedMessages = await handleDecrypt(messages);
+      setMessages(decryptedMessages);
       setTopic(topic);
     } catch (error) {
       alert("An Error Occured while fetching messages");
@@ -52,6 +70,8 @@ export default function App() {
       if (!response.ok) {
         throw new Error(response.statusText);
       }
+      selectTopic(currentTopic);
+      setMessageInput("");
     } catch (error) {
       alert("An Error Occured while sending message");
       console.log(error);
@@ -70,10 +90,7 @@ export default function App() {
       if (!response.ok) {
         throw new Error(response.statusText);
       }
-      const temp = topics;
-      temp.push(topicCode);
-      
-      setTopics(temp);
+      setTopics(prev => [...prev, topicCode]);
     } catch (error) {
       alert(`An Error Occured while joining topic ${topicCode}`);
       console.log(error);
@@ -88,10 +105,7 @@ export default function App() {
         throw new Error(response.statusText);
       }
       const topicId = await response.json();
-      const temp = topics;
-      
-      temp.push(topicId);
-      setTopics(temp);
+      setTopics(prev => [...prev, topicId]);
       alert(`New Topic created, Topic ID: ${topicId}`);
     } catch (error) {
       alert("An Error Occured while creating the topic");
@@ -163,7 +177,7 @@ export default function App() {
                     {msg.sender !== currentUser && (
                       <p className="text-xs font-semibold mb-1 opacity-70">{msg.sender}</p>
                     )}
-                    <p className="text-sm">{decryptMessage(msg.text)}</p>
+                    <p className="text-lg text-green-600">{msg.text}</p>
                     <p className="text-xs mt-1 opacity-70">{msg.timestamp}</p>
                   </div>
                 </div>
@@ -197,7 +211,7 @@ export default function App() {
       </div>
 
       {showJoinModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center p-4">
+        <div className="fixed inset-0 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">Join Topic</h2>
             <input

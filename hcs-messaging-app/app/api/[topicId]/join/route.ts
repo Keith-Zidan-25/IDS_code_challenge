@@ -2,11 +2,12 @@ import { NextResponse, NextRequest } from "next/server";
 import environmentSetup from "@/utils/setup";
 import { TopicMessageQuery } from "@hashgraph/sdk";
 
-export async function GET(request: NextRequest, 
-    { params }: { params: { topicId: string }}
+export async function GET(
+    request: NextRequest, 
+    context: { params: Promise<{ topicId: string }> }
 ) {
     try {
-        const topicId = await params.topicId;
+        const {topicId} = await context.params;
         const client = await environmentSetup();
 
         if (!topicId) {

@@ -37,11 +37,11 @@ async function responseMapper(data: responseT) {
 
 export async function POST(
     request: NextRequest,
-    { params }: { params: { topicId: string }}
+    context: { params: Promise<{ topicId: string }> }
 ) {
     try {
         const client = await environmentSetup();
-        const topicId = await params.topicId;
+        const {topicId} = await context.params;
         const message = await request.json();
 
         if (!message || !topicId) {
@@ -66,10 +66,10 @@ export async function POST(
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { topicId: string }}
+    context: { params: Promise<{ topicId: string }> }
 ) {
     try {
-        const topicId = await params.topicId;
+        const {topicId} = await context.params;
         const MirrorNodeApiUrl = process.env.MIRROR_NODE_API;
 
         if (!topicId) {
