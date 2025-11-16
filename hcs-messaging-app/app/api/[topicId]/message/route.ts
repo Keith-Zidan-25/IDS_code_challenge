@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
-import environmentSetup from "@/utils/setup";
+import environmentSetup from "../../../../utils/setup";
 import { TopicMessageSubmitTransaction } from "@hashgraph/sdk";
-import { decryptMessage } from "@/utils/aes";
+import { decryptMessage } from "../../../../utils/aes";
 
 interface responseT {
     messages: {

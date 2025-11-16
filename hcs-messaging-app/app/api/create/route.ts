@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import environmentSetup from "@/utils/setup";
+import environmentSetup from "../../../utils/setup";
 import { TopicCreateTransaction, TopicMessageQuery } from "@hashgraph/sdk";
 
 export async function GET(request: NextRequest) {
