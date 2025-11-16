@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import environmentSetup from "@/utils/setup";
 import { TopicMessageSubmitTransaction } from "@hashgraph/sdk";
+import { decryptMessage } from "@/utils/aes";
 
 interface responseT {
     messages: {
@@ -22,10 +23,11 @@ async function responseMapper(data: responseT) {
     const result = [];
 
     for (const value of messages) {
+        const decryptedtext = await decryptMessage(value.message);
         const mapped = {
             id: value.sequence_number,
             sender: value.payer_account_id,
-            text: value.message,
+            text: decryptedtext,
             timestamp: value.consensus_timestamp
         }
 
@@ -43,6 +45,7 @@ export async function POST(
         const client = await environmentSetup();
         const {topicId} = await context.params;
         const message = await request.json();
+        console.log("Message Sent: ",message)
 
         if (!message || !topicId) {
             console.log(message, topicId);

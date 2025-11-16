@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Plus, UserPlus, Hash, User } from 'lucide-react';
-import { encryptMessage, decryptMessage } from '@/utils/aes';
+import { encryptMessage } from '@/utils/aes';
 
 interface MessageT {
   id: number;
@@ -21,23 +21,6 @@ export default function App() {
   const [messages, setMessages] = useState<MessageT[]>();
   const [showJoinModal, setShowJoinModal] = useState<boolean>(false);
 
-  const handleDecrypt = async (messages: MessageT[]) => {
-    const result = [];
-    for (const message of messages) {
-      const decryptedMessage = await decryptMessage(message.text);
-      const temp = {
-        id: message.id,
-        sender: message.sender,
-        text: decryptedMessage,
-        timestamp: message.timestamp
-      }
-
-      result.push(temp)
-    }
-
-    return result;
-  }
-
   const selectTopic = async (topic: string) => {
     try {
       const response = await fetch(`/api/${topic}/message`);
@@ -46,8 +29,7 @@ export default function App() {
         throw new Error(response.statusText);
       }
       const messages = await response.json();
-      const decryptedMessages = await handleDecrypt(messages);
-      setMessages(decryptedMessages);
+      setMessages(messages);
       setTopic(topic);
     } catch (error) {
       alert("An Error Occured while fetching messages");
@@ -91,6 +73,7 @@ export default function App() {
         throw new Error(response.statusText);
       }
       setTopics(prev => [...prev, topicCode]);
+      setShowJoinModal(false);
     } catch (error) {
       alert(`An Error Occured while joining topic ${topicCode}`);
       console.log(error);
@@ -141,7 +124,7 @@ export default function App() {
               key={index}
               onClick={() => selectTopic(topic)}
               className={`p-3 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition ${
-                currentTopic === topic ? 'bg-blue-50' : 'bg-green-600'
+                currentTopic === topic ? 'bg-blue-50' : 'bg-gray-50'
               }`}
             >
               <div className="flex items-center gap-3">
