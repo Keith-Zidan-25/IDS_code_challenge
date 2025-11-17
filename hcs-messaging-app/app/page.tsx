@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Plus, UserPlus, Hash, User } from 'lucide-react';
-import { encryptMessage } from '@/utils/aes';
+import { Send, Plus, UserPlus, Hash, User, Search } from 'lucide-react';
 
 interface MessageT {
   id: number;
@@ -20,6 +19,7 @@ export default function App() {
   const [messageInput, setMessageInput] = useState<string>('');
   const [messages, setMessages] = useState<MessageT[]>();
   const [showJoinModal, setShowJoinModal] = useState<boolean>(false);
+  const [filterText, setfilterText] = useState<string>('');
 
   const selectTopic = async (topic: string) => {
     try {
@@ -30,6 +30,7 @@ export default function App() {
       }
       const messages = await response.json();
       setMessages(messages);
+      setfilterText("");
       setTopic(topic);
     } catch (error) {
       alert("An Error Occured while fetching messages");
@@ -43,10 +44,9 @@ export default function App() {
       return;
     }
     try {
-      const encryptedMessage = await encryptMessage(messageInput);
       const response = await fetch(`/api/${currentTopic}/message`, {
         method: "POST",
-        body: JSON.stringify(encryptedMessage)
+        body: JSON.stringify(messageInput)
       });
 
       if (!response.ok) {
@@ -95,6 +95,11 @@ export default function App() {
       console.log(error);
     }
   }
+
+  const filteredMessages = messages?.filter(
+    (msg) => msg.text.toLowerCase().includes(filterText.toLowerCase())
+  );
+
   return (
     <div className="flex h-screen bg-gray-50">
       <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
@@ -144,10 +149,20 @@ export default function App() {
               <div className="flex items-center">
                 <h2 className="font-semibold text-gray-800">{currentTopic}</h2>
               </div>
+              <div className="mt-3 flex items-center border border-gray-300 rounded-lg p-2 bg-gray-50">
+                <Search size={18} className="text-gray-400 mr-2" />
+                <input
+                  type="text"
+                  value={filterText}
+                  onChange={(e) => setfilterText(e.target.value)}
+                  placeholder="Filter messages..."
+                  className="flex-1 bg-transparent focus:outline-none text-gray-800"
+                />
+              </div>
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
-              {messages && messages.map(msg => (
+              {filteredMessages && filteredMessages.map(msg => (
                 <div
                   key={msg.id}
                   className={`flex ${msg.sender === currentUser ? 'justify-end' : 'justify-start'}`}
@@ -165,6 +180,11 @@ export default function App() {
                   </div>
                 </div>
               ))}
+              {filterText && messages && !filteredMessages && (
+                <div>
+                  <p>No Messages found</p>
+                </div>
+              )}
             </div>
 
             <div className="bg-white border-t border-gray-200 p-4">

@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import environmentSetup from "../../../../utils/setup";
 import { TopicMessageSubmitTransaction } from "@hashgraph/sdk";
-import { decryptMessage } from "../../../../utils/aes";
+import { decryptMessage, encryptMessage } from "../../../../utils/aes";
 
 interface responseT {
     messages: {
@@ -51,9 +51,10 @@ export async function POST(
             console.log(message, topicId);
             return NextResponse.json({}, { status: 404, statusText: "Missing parameters"});
         }
+        const encryptedMessage = await encryptMessage(message);
         const response = await new TopicMessageSubmitTransaction({
             topicId: topicId,
-            message: message,
+            message: encryptedMessage,
         }).execute(client);
 
         const getReceipt = await response.getReceipt(client);
