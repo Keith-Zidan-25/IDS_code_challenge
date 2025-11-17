@@ -1,0 +1,22 @@
+cities = {
+    "Mumbai": (12, 85),
+    "Delhi": (90, 95),
+    "Bengaluru": (25, 20),
+    "Hyderabad": (45, 40),
+    "Chennai": (35, 10),
+    "Kolkata": (95, 60),
+    "Pune": (10, 75),
+    "Jaipur": (75, 85),
+    "Lucknow": (85, 70),
+    "Ahmedabad": (20, 90),
+    "Surat": (22, 78),
+    "Nagpur": (50, 55),
+    "Indore": (35, 65),
+    "Bhopal": (40, 70),
+    "Patna": (95, 50),
+    "Guwahati": (99, 40),
+    "Ranchi": (90, 55),
+    "Visakhapatnam": (48, 15),
+    "Thiruvananthapuram": (18, 5),
+    "Goa": (15, 50)
+}
